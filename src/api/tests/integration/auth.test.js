@@ -13,9 +13,9 @@ const sandbox = sinon.createSandbox();
 const fakeOAuthRequest = () => Promise.resolve({
   service: 'facebook',
   id: '123',
-  name: 'user',
+  username: 'user',
   email: 'test@test.com',
-  picture: 'test.jpg',
+  avatar: 'test.jpg'
 });
 
 describe('Authentication API', () => {
@@ -27,21 +27,21 @@ describe('Authentication API', () => {
     dbUser = {
       email: 'branstark@gmail.com',
       password: 'mypassword',
-      name: 'Bran Stark',
-      role: 'admin',
+      username: 'Bran Stark',
+      role: 'admin'
     };
 
     user = {
       email: 'sousa.dfs@gmail.com',
       password: '123456',
-      name: 'Daniel Sousa',
+      username: 'Daniel Sousa'
     };
 
     refreshToken = {
       token: '5947397b323ae82d8c3a333b.c69d0435e62c9f4953af912442a3d064e20291f0d228c0552ed4be473e7d191ba40b18c2c47e8b9d',
       userId: '5947397b323ae82d8c3a333b',
       userEmail: dbUser.email,
-      expires: new Date(),
+      expires: new Date()
     };
 
     await User.remove({});

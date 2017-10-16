@@ -42,27 +42,27 @@ describe('Users API', async () => {
       branStark: {
         email: 'branstark@gmail.com',
         password: passwordHashed,
-        name: 'Bran Stark',
-        role: 'admin',
+        username: 'Bran Stark',
+        role: 'admin'
       },
       jonSnow: {
         email: 'jonsnow@gmail.com',
         password: passwordHashed,
-        name: 'Jon Snow',
-      },
+        username: 'Jon Snow'
+      }
     };
 
     user = {
       email: 'sousa.dfs@gmail.com',
       password,
-      name: 'Daniel Sousa',
+      username: 'Daniel Sousa'
     };
 
     admin = {
       email: 'sousa.dfs@gmail.com',
       password,
-      name: 'Daniel Sousa',
-      role: 'admin',
+      username: 'Daniel Sousa',
+      role: 'admin'
     };
 
     await User.remove({});
@@ -413,15 +413,15 @@ describe('Users API', async () => {
     it('should update user', async () => {
       delete dbUsers.branStark.password;
       const id = (await User.findOne(dbUsers.branStark))._id;
-      const { name } = user;
+      const { username } = user;
 
       return request(app)
         .patch(`/v1/users/${id}`)
         .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({ name })
+        .send({ username })
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.name).to.be.equal(name);
+          expect(res.body.username).to.be.equal(username);
           expect(res.body.email).to.be.equal(dbUsers.branStark.email);
         });
     });
