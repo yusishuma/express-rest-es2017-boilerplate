@@ -18,31 +18,6 @@ const roles = ['user', 'admin'];
  * @private
  */
 const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    match: /^\S+@\S+\.\S+$/,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 6,
-    maxlength: 128,
-    validate: [
-      function (pwd) {
-        return pwd.length >= 6;
-      },
-      'Password too short!'
-    ]
-  },
-  services: {
-    facebook: String,
-    google: String
-  },
   createdAt: {
     type: Date,
     required: true,
@@ -62,6 +37,19 @@ const userSchema = new mongoose.Schema({
     required: true,
     maxlength: 128
   },
+  password: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 6,
+    maxlength: 128,
+    validate: [
+      function (pwd) {
+        return pwd.length >= 6;
+      },
+      'Password too short!'
+    ]
+  },
   // 昵称
   nickname: {
     type: String,
@@ -75,11 +63,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: VALUE.USER_ROLE.NORMAL
   },
-  // 用户组
-  userType: {
-    type: Number,
-    required: true,
-    default: VALUE.USER_GROUP.NEWBIE
+  // 所属企业
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company'
   },
   // 个性签名
   signature: {
@@ -91,13 +78,6 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: VALUE.GENDER.UNKNOWN
   },
-  // 申请游戏陪玩儿状态
-  applyForSeller: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'application'
-    }
-  ],
   // 加密盐
   salt: String,
   // 用户头像
@@ -105,24 +85,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'http://opoewyfvz.bkt.clouddn.com/default_icon.png'
   },
-  // 评价星级
-  level: {
-    type: Number,
-    default: 0
-  },
-  // 用户编号
-  uid: {
-    type: Number,
-    default: 100000099
-  },
   // 菠菜币
   coin: {
     type: Number,
     required: true,
     default: 10000
-  },
-  openId: { //  微信 openId
-    type: String
   },
   available_balance: {// 用户余额
     type: Number
@@ -157,8 +124,6 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // 标记读取通知的时间
-  markReadNoticeTime: Number,
   // 标记用户最后获得赌局结果的时间
   markLastGambleHaveResultTime: {
     type: Number,
@@ -168,11 +133,6 @@ const userSchema = new mongoose.Schema({
   markLastViewGambleListTime: {
     type: Number,
     default: new Date().valueOf()
-  },
-  // 所接订单中游戏胜率
-  orderGamesWinRate: {
-    type: Number,
-    default: 0
   }
 }, {
   timestamps: true

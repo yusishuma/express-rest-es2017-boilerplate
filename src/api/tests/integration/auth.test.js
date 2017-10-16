@@ -9,7 +9,7 @@ const RefreshToken = require('../../models/refreshToken.model');
 const authProviders = require('../../services/authProviders');
 
 const sandbox = sinon.createSandbox();
-
+const VALUE = require('../../../config/value');
 const fakeOAuthRequest = () => Promise.resolve({
   service: 'facebook',
   id: '123',
@@ -28,7 +28,7 @@ describe('Authentication API', () => {
       email: 'branstark@gmail.com',
       password: 'mypassword',
       username: 'Bran Stark',
-      role: 'admin'
+      role: VALUE.USER_ROLE.NORMAL
     };
 
     user = {

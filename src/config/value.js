@@ -331,7 +331,7 @@ exports.translateRank = function translateRank(rank) {
     case 7:
       return '英勇黄铜';
     default:
-      return '';
+      return '英勇黄铜';
   }
 };
 exports.RACE_MODE = {
