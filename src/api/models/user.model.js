@@ -7,7 +7,7 @@ const jwt = require('jwt-simple');
 const uuidv4 = require('uuid/v4');
 const APIError = require('../utils/APIError');
 const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
-
+const VALUE = require('../../config/value');
 /**
 * User Roles
 */
@@ -24,35 +24,158 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    lowercase: true,
+    lowercase: true
   },
   password: {
     type: String,
     required: true,
+    trim: true,
     minlength: 6,
     maxlength: 128,
-  },
-  name: {
-    type: String,
-    maxlength: 128,
-    index: true,
-    trim: true,
+    validate: [
+      function (pwd) {
+        return pwd.length >= 6;
+      },
+      'Password too short!'
+    ]
   },
   services: {
     facebook: String,
-    google: String,
+    google: String
   },
-  role: {
-    type: String,
-    enum: roles,
-    default: 'user',
+  createdAt: {
+    type: Date,
+    required: true,
+    default: Date.now
   },
-  picture: {
+  updatedAt: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+  // 手机号
+  username: {
     type: String,
     trim: true,
+    index: true,
+    unique: true,
+    required: true,
+    maxlength: 128
   },
+  // 昵称
+  nickname: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  // 角色
+  role: {
+    type: Number,
+    required: true,
+    default: VALUE.USER_ROLE.NORMAL
+  },
+  // 用户组
+  userType: {
+    type: Number,
+    required: true,
+    default: VALUE.USER_GROUP.NEWBIE
+  },
+  // 个性签名
+  signature: {
+    type: String,
+    default: ''
+  },
+  // 性别
+  gender: {
+    type: Number,
+    default: VALUE.GENDER.UNKNOWN
+  },
+  // 申请游戏陪玩儿状态
+  applyForSeller: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'application'
+    }
+  ],
+  // 加密盐
+  salt: String,
+  // 用户头像
+  avatar: {
+    type: String,
+    default: 'http://opoewyfvz.bkt.clouddn.com/default_icon.png'
+  },
+  // 评价星级
+  level: {
+    type: Number,
+    default: 0
+  },
+  // 用户编号
+  uid: {
+    type: Number,
+    default: 100000099
+  },
+  // 菠菜币
+  coin: {
+    type: Number,
+    required: true,
+    default: 10000
+  },
+  openId: { //  微信 openId
+    type: String
+  },
+  available_balance: {// 用户余额
+    type: Number
+  },
+  // 用户当日收益上限
+  todayEarnAmount: {
+    type: Number,
+    default: 3000
+  },
+  // 用户当日花费菠菜币
+  todaySpendCoin: {
+    type: Number,
+    default: 0
+  },
+  // 用户本周赢取菠菜币
+  weekWinCoin: {
+    type: Number,
+    default: 0
+  },
+  // 用户本周输掉的菠菜币
+  weekLoseCoin: {
+    type: Number,
+    default: 0
+  },
+  // 竞猜胜场
+  gamblingWinTimes: {
+    type: Number,
+    default: 0
+  },
+  // 竞猜参与次数
+  gamblingPartInTimes: {
+    type: Number,
+    default: 0
+  },
+  // 标记读取通知的时间
+  markReadNoticeTime: Number,
+  // 标记用户最后获得赌局结果的时间
+  markLastGambleHaveResultTime: {
+    type: Number,
+    default: (new Date()).valueOf()
+  },
+  // 标记用户最后查看获得赌局结果的时间
+  markLastViewGambleListTime: {
+    type: Number,
+    default: new Date().valueOf()
+  },
+  // 所接订单中游戏胜率
+  orderGamesWinRate: {
+    type: Number,
+    default: 0
+  }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
 /**
@@ -82,7 +205,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'name', 'email', 'picture', 'role', 'createdAt'];
+    const fields = ['id', 'username', 'email', 'avatar', 'role', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -95,14 +218,14 @@ userSchema.method({
     const playload = {
       exp: moment().add(jwtExpirationInterval, 'minutes').unix(),
       iat: moment().unix(),
-      sub: this._id,
+      sub: this._id
     };
     return jwt.encode(playload, jwtSecret);
   },
 
   async passwordMatches(password) {
     return bcrypt.compare(password, this.password);
-  },
+  }
 });
 
 /**
@@ -131,7 +254,7 @@ userSchema.statics = {
 
       throw new APIError({
         message: 'User does not exist',
-        status: httpStatus.NOT_FOUND,
+        status: httpStatus.NOT_FOUND
       });
     } catch (error) {
       throw error;
@@ -151,7 +274,7 @@ userSchema.statics = {
     const user = await this.findOne({ email }).exec();
     const err = {
       status: httpStatus.UNAUTHORIZED,
-      isPublic: true,
+      isPublic: true
     };
     if (password) {
       if (user && await user.passwordMatches(password)) {
@@ -174,9 +297,9 @@ userSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, name, email, role,
+    page = 1, perPage = 30, username, email, role
   }) {
-    const options = omitBy({ name, email, role }, isNil);
+    const options = omitBy({ username, email, role }, isNil);
 
     return this.find(options)
       .sort({ createdAt: -1 })
@@ -199,31 +322,31 @@ userSchema.statics = {
         errors: [{
           field: 'email',
           location: 'body',
-          messages: ['"email" already exists'],
+          messages: ['"email" already exists']
         }],
         status: httpStatus.CONFLICT,
         isPublic: true,
-        stack: error.stack,
+        stack: error.stack
       });
     }
     return error;
   },
 
   async oAuthLogin({
-    service, id, email, name, picture,
+    service, id, email, username, avatar
   }) {
     const user = await this.findOne({ $or: [{ [`services.${service}`]: id }, { email }] });
     if (user) {
       user.services[service] = id;
-      if (!user.name) user.name = name;
-      if (!user.picture) user.picture = picture;
+      if (!user.username) user.username = username;
+      if (!user.avatar) user.avatar = avatar;
       return user.save();
     }
     const password = uuidv4();
     return this.create({
-      services: { [service]: id }, email, password, name, picture,
+      services: { [service]: id }, email, password, username, avatar
     });
-  },
+  }
 };
 
 /**

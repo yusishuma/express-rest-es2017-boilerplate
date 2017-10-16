@@ -1,6 +1,6 @@
 {
-  "name": "express-rest-es2017-boilerplate",
-  "version": "1.2.1",
+  "name": "api-server",
+  "version": "1.0.0",
   "description": "Express boilerplate for building RESTful APIs",
   "author": "Daniel Sousa <sousa.dfs@gmail.com>",
   "main": "src/index.js",
@@ -84,6 +84,7 @@
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "3.0.0",
+    "passport-oauth": "^1.0.0",
     "pm2": "^2.4.6",
     "uuid": "^3.1.0"
   },

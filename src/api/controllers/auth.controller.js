@@ -13,7 +13,7 @@ function generateTokenResponse(user, accessToken) {
   const refreshToken = RefreshToken.generate(user).token;
   const expiresIn = moment().add(jwtExpirationInterval, 'minutes');
   return {
-    tokenType, accessToken, refreshToken, expiresIn,
+    tokenType, accessToken, refreshToken, expiresIn
   };
 }
 
@@ -74,7 +74,7 @@ exports.refresh = async (req, res, next) => {
     const { email, refreshToken } = req.body;
     const refreshObject = await RefreshToken.findOneAndRemove({
       userEmail: email,
-      token: refreshToken,
+      token: refreshToken
     });
     const { user, accessToken } = await User.findAndGenerateToken({ email, refreshObject });
     const response = generateTokenResponse(user, accessToken);

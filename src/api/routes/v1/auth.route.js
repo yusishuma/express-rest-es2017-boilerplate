@@ -6,7 +6,7 @@ const {
   login,
   register,
   oAuth,
-  refresh,
+  refresh
 } = require('../../validations/auth.validation');
 
 const router = express.Router();

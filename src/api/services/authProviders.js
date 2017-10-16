@@ -2,19 +2,19 @@
 const axios = require('axios');
 
 exports.facebook = async (access_token) => {
-  const fields = 'id, name, email, picture';
+  const fields = 'id, username, email, avatar';
   const url = 'https://graph.facebook.com/me';
   const params = { access_token, fields };
   const response = await axios.get(url, { params });
   const {
-    id, name, email, picture,
+    id, username, email, avatar
   } = response.data;
   return {
     service: 'facebook',
-    picture: picture.data.url,
+    avatar: avatar.data.url,
     id,
-    name,
-    email,
+    username,
+    email
   };
 };
 
@@ -23,13 +23,13 @@ exports.google = async (access_token) => {
   const params = { access_token };
   const response = await axios.get(url, { params });
   const {
-    sub, name, email, picture,
+    sub, username, email, avatar
   } = response.data;
   return {
     service: 'google',
-    picture,
+    avatar,
     id: sub,
-    name,
-    email,
+    username,
+    email
   };
 };

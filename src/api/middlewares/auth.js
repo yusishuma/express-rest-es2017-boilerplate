@@ -12,7 +12,7 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
   const apiError = new APIError({
     message: error ? error.message : 'Unauthorized',
     status: httpStatus.UNAUTHORIZED,
-    stack: error ? error.stack : undefined,
+    stack: error ? error.stack : undefined
   });
 
   try {
